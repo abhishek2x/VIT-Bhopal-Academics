@@ -1,0 +1,75 @@
+C51 COMPILER V9.60.0.0   MAIN                                                              03/26/2022 13:02:12 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\main
+                    -.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <reg51.h> 
+   2          //sfr ADC = 0x90;
+   3          sbit READ_ADC=P3^0; //Read(RD) pin of ADC0804
+   4          sbit WRITE_ADC=P3^1; //Write(WR) pin of ADC0804
+   5          sbit INTR_ADC=P3^2; //Interrupt(INTR) pin of ADC0804 
+   6          unsigned char ADC_VALUE;
+   7          char Tempr[] = " 00.0 C"; //set Temp display format in Celsius
+   8          int C; 
+   9          void delay_ms(unsigned int time)    //Function to provide time delay in msec.
+  10          {
+  11   1      int i,j ;
+  12   1      for(i=0;i<time;i++)
+  13   1      for(j=0;j<1275;j++);
+  14   1      }
+  15          
+  16          
+  17          /* main program */
+  18          void main() 
+  19          {
+  20   1          P1=0xFF; //make Port 1 as input port
+  21   1          INTR_ADC=1; //make INTR pin as input
+  22   1          READ_ADC=1; //set RD pin HIGH
+  23   1          WRITE_ADC=1; //set WR pin LOW
+  24   1        
+  25   1      
+  26   1          while(1)
+  27   1          {
+  28   2         WRITE_ADC=0; //send LOW to HIGH pulse on WR pin
+  29   2         delay_ms(1);
+  30   2         WRITE_ADC=1;
+  31   2         while(INTR_ADC==1); //wait for End of Conversion
+  32   2         READ_ADC=0; //make RD = 0 to read the data from ADC0804
+  33   2         ADC_VALUE=P1; //copy ADC data
+  34   2         
+  35   2          C = ADC_VALUE*1.95;               // // Read analog voltage and convert it to degree Celsius 
+  36   2          if (C > 99)
+  37   2          Tempr[0]  = 1 + 48;              // Put 1 (of hundred)
+  38   2          else
+  39   2          Tempr[0]  = ' ';                 // Put space
+  40   2          Tempr[1]  = (C / 10) % 10 + 48;
+  41   2          Tempr[2]  =  C % 10  + 48;
+  42   2          Tempr[5] = 223;                    // Put degree symbol ( ° ) 
+  43   2      
+  44   2         delay_ms(10);  //interval between every cycles
+  45   2         READ_ADC=1;   //make RD = 1 for the next cycle
+  46   2        delay_ms(1000);  //interval between every cycles  
+  47   2      
+  48   2           }
+  49   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    165    ----
+   CONSTANT SIZE    =   ----    ----
+C51 COMPILER V9.60.0.0   MAIN                                                              03/26/2022 13:02:12 PAGE 2   
+
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     11    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
